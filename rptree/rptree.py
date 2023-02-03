@@ -11,19 +11,21 @@ SPACE_PREFIX = "    "
 
 
 class DirectoryTree:
-    def __init__(self, root_dir):
-        self._generator = _TreeGenerator(root_dir)
+    def __init__(self, root_dir, dir_only=False):
+        self._generator = _TreeGenerator(root_dir, dir_only)
+
 
     def generate(self):
         tree = self._generator.build_tree()
-
         for entry in tree:
             if entry != "":
                 print(entry)
 
 class _TreeGenerator:
-    def __init__(self, root_dir) -> None:
+    def __init__(self, root_dir, dir_only=False):
         self._root_dir = pathlib.Path(root_dir)
+        self._dir_only = dir_only
+
         self._tree = []
     
     def build_tree(self) -> list:
@@ -54,7 +56,7 @@ class _TreeGenerator:
                                     Defaults to "".
         """
         # creates a generator from the pathlib.Path objects of the root directory
-        entries = directory.iterdir()
+        entries = self._prepare_entries(directory)
         # sorts the directories alphabetically with putting the directories before the files
         # To do this, you create a lambda function that checks if entry is a file and returns True or False accordingly. 
         # In Python, True and False are internally represented as integer numbers, 1 and 0, respectively. 
@@ -64,24 +66,33 @@ class _TreeGenerator:
         entries = sorted(entries, key=lambda entry: entry.is_file())
         # counts the number of entries in the current level of the tree
         entries_count = len(entries)
-
         for index, entry in enumerate(entries): 
-
             # if the current entry is the last in the directory (index == entries_count - 1), 
             # then you use an elbow (└──) as a connector. 
             # Otherwise, you use a tee (├──).
             connector = ELBOW if index == entries_count - 1 else TEE
 
             if entry.is_dir():
-                self._add_directory(entry, 
-                                    index, 
-                                    entries_count, 
-                                    prefix, 
-                                    connector
-                                    )
+                self._add_directory(entry, index, entries_count, prefix, connector)
             else:
                 self._add_file(entry, prefix, connector)
     
+    def _prepare_entries(self,directory):
+        """method that if a dir_only flag is raised discards files from the tree
+
+        Args:
+            directory (pathlib.Path object): the directory for which to create the tree
+
+        Returns:
+            pathlib.Path object: the trimmed or not generator with the entries of the directory tree
+        """
+        entries = directory.iterdir()
+        if self._dir_only:
+            entries = [entry for entry in entries if entry.is_dir()]
+            return entries
+        entries = sorted(entries, key=lambda entry: entry.is_file())
+        return entries
+
     def _add_directory(self, directory, index, entries_count, prefix, connector):
 
         self._tree.append(f"{prefix}{connector} {directory.name}{os.sep}")
