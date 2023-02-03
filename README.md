@@ -13,3 +13,12 @@ also to print a help in the command line you can type:
 ```
 python /path-to-repo-dir/tree.py -h
 ```
+
+# TODO
+
+- Add support for sorting files and directories:
+    - e.g. Add -s and --sort-tree Boolean flags to allow the user to tweak the order of files and directories in the final tree diagram.
+
+- Add icons and colors to the tree diagram:
+    - Adding icons (add custom folder icons for dirs and type-based icons for the files),
+    - adding font colors,
