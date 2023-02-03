@@ -5,7 +5,7 @@ A simple directory tree generator based on the tutorial by [realpython.com](http
 # Usage
 first clone the repository and then type in a terminal:
 ```
-python /path-to-directory-of-rptree/tree.py ROOT_DIR
+python /path-to-repo-dir/tree.py ROOT_DIR
 ```
 where ROOT_DIR is the relative path to the directory for which you want to create a directory tree.
 
