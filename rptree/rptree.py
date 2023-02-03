@@ -3,6 +3,7 @@
 import os
 import sys
 import pathlib
+from collections import deque
 
 PIPE = "│"
 ELBOW = "└──"
@@ -13,6 +14,7 @@ SPACE_PREFIX = "    "
 
 class DirectoryTree:
     def __init__(self, root_dir, dir_only=False, output_file=sys.stdout):
+        self.root_dir = root_dir
         self._output_file = output_file
 
         self._generator = _TreeGenerator(root_dir, dir_only)
@@ -22,7 +24,7 @@ class DirectoryTree:
         tree = self._generator.build_tree()
         if self._output_file != sys.stdout:
             # Wrap the tree in a markdown code block
-            tree.insert(0, "```") #TOFIX: instead of using 
+            tree.appendleft(f"Tree of ```{os.path.abspath(self.root_dir)}```:\n```") 
             tree.append("```")
             self._output_file = open(
                 self._output_file, mode="w", encoding="UTF-8"
@@ -37,7 +39,7 @@ class _TreeGenerator:
         self._root_dir = pathlib.Path(root_dir)
         self._dir_only = dir_only
 
-        self._tree = []
+        self._tree = deque() # creates a deque for the tree instead of a list
     
     def build_tree(self) -> list:
         """This public method generates and returns the directory tree diagram.
